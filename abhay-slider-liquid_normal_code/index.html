@@ -1,0 +1,226 @@
+convert it into shopify liquid code: <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Responsive Slider</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+      }
+
+      .container {
+        width: 100%;
+        aspect-ratio: 12 / 5;
+        margin: 00px auto;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .slider {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+        border-radius: 0;
+      }
+
+      .slider img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        position: absolute;
+        top: 0;
+        left: 0;
+        opacity: 0;
+        transform: translateX(100%);
+        transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+      }
+
+      .slider img.active {
+        opacity: 1;
+        transform: translateX(0);
+      }
+
+      .slider img.previous {
+        transform: translateX(-100%);
+      }
+
+      /* Dots INSIDE the slider */
+      .navigation-button {
+        position: absolute;
+        bottom: 5%;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 15;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .line {
+        cursor: pointer;
+        height: 10px;
+        width: 10px;
+        background-color: rgba(255, 255, 255, 0.7);
+        border-radius: 50%;
+        display: inline-block;
+        transition: background-color 0.3s, transform 0.3s;
+      }
+
+      .line.active {
+        background-color: #fff;
+        transform: scale(1.2);
+      }
+
+      .nav-button {
+        position: absolute;
+        top: 88%;
+        background-color: transparent;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 60px;
+        padding: 14px 20px;
+        z-index: 20;
+        transform: translateY(-50%);
+      }
+
+      .prev {
+        left: 15px;
+      }
+
+      .next {
+        right: 15px;
+      }
+
+      /* Hide both sliders initially */
+      .fw-dt-slider,
+      .fw-mb-slider {
+        display: none;
+      }
+
+      /* Desktop: show desktop slider */
+      @media (min-width: 701px) {
+        .fw-dt-slider {
+          display: block;
+        }
+      }
+
+      /* Mobile view adjustments */
+      @media (max-width: 700px) {
+        .fw-mb-slider {
+          display: block;
+        }
+
+        .container {
+          width: 100%;
+          aspect-ratio: 9 / 12;
+        }
+
+        .nav-button {
+          font-size: 34px;
+          padding: 8px 12px;
+        }
+
+        .navigation-button {
+          bottom: 4%;
+          gap: 5px;
+        }
+
+        .line {
+          height: 8px;
+          width: 8px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <!-- Desktop Slider -->
+      <div class="slider fw-dt-slider">
+        <img class="active" src="./src/images/FW-BG-DT-1.png" alt="Image 1" />
+        <img src="./src/images/FW-BG-DT-2.png" alt="Image 2" />
+        <img src="./src/images/FW-BG-DT-3.png" alt="Image 3" />
+      </div>
+
+      <!-- Mobile Slider -->
+      <div class="slider fw-mb-slider">
+        <img class="active" src="./src/images/FW-BG-MB-1.png" alt="Image 1" />
+        <img src="./src/images/FW-BG-MB-2.png" alt="Image 2" />
+        <img src="./src/images/FW-BG-MB-3.png" alt="Image 3" />
+      </div>
+
+      <div class="navigation-button" id="navButtons"></div>
+      <button id="prevButton" class="nav-button prev">&#8592;</button>
+      <button id="nextButton" class="nav-button next">&#8594;</button>
+    </div>
+
+    <script>
+      function initSlider(selector) {
+        const slider = document.querySelector(selector);
+        if (!slider) return;
+
+        const imgs = slider.querySelectorAll("img");
+        let currentImg = 0;
+        const interval = 4000;
+
+        const navButtonsContainer = document.getElementById("navButtons");
+        navButtonsContainer.innerHTML = "";
+
+        imgs.forEach((_, i) => {
+          const btn = document.createElement("span");
+          btn.classList.add("line");
+          btn.addEventListener("click", () => changeSlide(i));
+          navButtonsContainer.appendChild(btn);
+        });
+
+        function changeSlide(n) {
+          imgs.forEach((img, i) => {
+            img.classList.remove("active", "previous");
+            navButtonsContainer.children[i].classList.remove("active");
+          });
+          const prev = currentImg;
+          currentImg = (n + imgs.length) % imgs.length;
+          imgs[currentImg].classList.add("active");
+          imgs[prev].classList.add("previous");
+          navButtonsContainer.children[currentImg].classList.add("active");
+        }
+
+        navButtonsContainer.children[currentImg].classList.add("active");
+
+        let timer = setInterval(() => changeSlide(currentImg + 1), interval);
+
+        document.getElementById("prevButton").onclick = () => {
+          changeSlide(currentImg - 1);
+          resetTimer();
+        };
+        document.getElementById("nextButton").onclick = () => {
+          changeSlide(currentImg + 1);
+          resetTimer();
+        };
+
+        function resetTimer() {
+          clearInterval(timer);
+          timer = setInterval(() => changeSlide(currentImg + 1), interval);
+        }
+      }
+
+      function loadResponsiveSlider() {
+        if (window.innerWidth <= 700) {
+          initSlider(".fw-mb-slider");
+        } else {
+          initSlider(".fw-dt-slider");
+        }
+      }
+
+      window.addEventListener("resize", loadResponsiveSlider);
+      window.addEventListener("load", loadResponsiveSlider);
+    </script>
+  </body>
+</html>
